@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///foodapp.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Optional, but helps with performance
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 
@@ -30,12 +30,18 @@ class Item(db.Model):
     name = db.Column(db.String(80), nullable=False)
     price = db.Column(db.Float, nullable=False)
     photo = db.Column(db.LargeBinary)
-    restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), nullable=False)
 
 
 class FoodOrder(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    price = db.Column(db.Float, nullable=False)
-    name = db.Column(db.String(120))  # Could be a list of items
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
     restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), nullable=False)
+    items = db.relationship('Item', secondary='order_item', lazy='subquery',
+                            backref=db.backref('orders', lazy=True))
+    time = db.Column(db.DateTime)
+    status = db.Column(db.String(20), default='pending')
+    total_price = db.Column(db.Float, nullable=False, default=0.0)
+
+    def calculate_total_price(self):
+        total_price = sum(item.price for item in self.items)
+        return total_price
