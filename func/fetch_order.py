@@ -13,6 +13,7 @@ databases = Databases(client)
 
 def fetch_orders():
     try:
+        
         result = databases.list_documents('66266c7731d81704bff0', 'order')
         return extract_order_data(result['documents'])
     except Exception as e:
@@ -21,31 +22,35 @@ def fetch_orders():
 
 # Data Extraction (similar to your JavaScript logic)
 def extract_order_data(api_response):
+    print(api_response)
     if api_response and len(api_response) > 0:
         order_list = []
         for orders in api_response:
+        #   print(orders)
           # order_data = api_response[0]
-          food_item_names = ', '.join(item['name'] for item in orders['foodItem'])
-          print(orders['time'])
+          food_item_names = ', '.join(item['name'] for item in orders['orderItem'])
+        #   print(orders['time'])
 
           order_list.append({
             'id': orders['id'],
             'items': food_item_names,
-            'status': orders['status'],
+            # 'status': orders['status'],
             'time': orders['time'],
-            'price': calculate_price(orders['foodItem']),
-            'restroName': orders['foodItem'][0]['restraunt']['name']
-            })
-    
+            'price': calculate_price(orders['orderItem']),
+            # 'restroName': orders['foodItem'][0]['restraunt']['name']
+            'name': orders['name'],
+            'address': orders['address'],
+            'phone_number': orders['phone_number']
+          })
         return order_list
     else:
         return None  
 
 # Helper function (replace if needed)
 def calculate_price(food_items):
-    total_price = sum(item['price'] for item in food_items)
-    return '$' + str(total_price)
-
-
-
-
+    if not food_items:
+        print('No food items found')
+        return '₹0'
+    else:
+        total_price = sum(item['price'] for item in food_items)
+        return '₹' + str(total_price)
