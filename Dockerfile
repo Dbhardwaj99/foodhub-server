@@ -9,6 +9,7 @@ RUN python -m venv venv
 RUN . venv/bin/activate
 
 RUN pip install --no-cache-dir -r requirements.txt
+# aws-password: beVqi9-wotzym-kywsam
 
 COPY . .
 

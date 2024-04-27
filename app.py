@@ -35,4 +35,4 @@ def create_order_endpoint():
     return "Order creation initiated", 200
 
 if __name__ == "__main__":
-    app.run(debug=True, port=9406) 
+    app.run(debug=True, port=9406, ssl_context='adhoc') 
